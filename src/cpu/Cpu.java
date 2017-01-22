@@ -1,4 +1,6 @@
-package components;
+package cpu;
+
+import interfaces.Instructions;
 
 public class Cpu implements Instructions{
 
