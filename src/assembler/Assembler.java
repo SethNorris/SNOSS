@@ -13,39 +13,53 @@ public class Assembler implements AssemblerInstructions{
 	public Assembler(){};
 
 	public void processFile(File assemblyCode) throws FileNotFoundException, IOException{
+		StringBuilder sb = new StringBuilder();
 		try(BufferedReader br = new BufferedReader(new FileReader(assemblyCode))) {
 			for(String line; (line = br.readLine()) != null; ) {
 				String[] split = line.split(" ");
 				switch(split[0]){
 				case "LOAD":
+					sb.append(load(split[1],split[2]));
 					break;
 				case "LOADC":
+					sb.append(loadc(split[1],split[2]));
 					break;
 				case "STORE":
+					sb.append(store(split[1],split[2]));
 					break;
 				case "ADD":
+					sb.append(add(split[1],split[2],split[3]));
 					break;
 				case "SUB":
+					sb.append(sub(split[1],split[2],split[3]));
 					break;
 				case "MUL":
+					sb.append(mul(split[1],split[2],split[3]));
 					break;
 				case "DIV":
+					sb.append(div(split[1],split[2],split[3]));
 					break;
 				case "EQ":
+					sb.append(eq(split[1],split[2],split[3]));
 					break;
 				case "GOTO":
+					sb.append(mygoto(split[1]));
 					break;
 				case "GOTOIF":
+					sb.append(gotoif(split[1],split[2]));
 					break;
 				case "CPRINT":
+					sb.append(cprint(split[1]));
 					break;
 				case "CREAD":
+					sb.append(cread(split[1]));
 					break;
 				case "EXIT":
+					sb.append(exit());
 					break;
 				}
 			}
-			// line is not visible here.
+			// write stringbuilder to file
 		}
 	}
 

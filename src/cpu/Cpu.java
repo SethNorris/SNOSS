@@ -4,14 +4,14 @@ import interfaces.Instructions;
 
 public class Cpu implements Instructions{
 
-	byte[] Register0 = new byte[8];
-	byte[] Register1 = new byte[8];
-	byte[] Register2 = new byte[8];
-	byte[] Register3 = new byte[8];
-	byte[] Register4 = new byte[8];
-	byte[] Register5 = new byte[8];
+	Register R1 = new Register();
+	Register R2 = new Register();
+	Register R3 = new Register();
+	Register R4 = new Register();
+	Register R5 = new Register();
+	Register R6 = new Register();
 	
-	byte[] RAM = new byte[10000];
+	RAM ram = new RAM();
 
 	@Override
 	public void load() {
