@@ -2,6 +2,6 @@ package cpu;
 
 public class Register {
 
-	byte[] memory = new byte[8];
+	byte[] memory = new byte[2];
 	
 }

@@ -12,81 +12,125 @@ public class Cpu implements Instructions{
 	Register R6 = new Register();
 	
 	RAM ram = new RAM();
+	
+	public void processCommand(byte[] command){
+		switch(command[0]){
+		case 1:
+			load(command);
+			break;
+		case 10:
+			loadc(command);
+			break;
+		case 2:
+			store(command);
+			break;
+		case 3:
+			add(command);
+			break;
+		case 4:
+			sub(command);
+			break;
+		case 5:
+			mul(command);
+			break;
+		case 6:
+			div(command);
+			break;
+		case 7:
+			eq(command);
+			break;
+		case 8:
+			mygoto(command);
+			break;
+		case 11:
+			gotoif(command);
+			break;
+		case 9:
+			cprint(command);
+			break;
+		case 16:
+			cread(command);
+			break;
+		case 17:
+			exit(command);
+			break;
+		}
+	}
 
 	@Override
-	public void load() {
+	public void load(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void loadc() {
+	public void loadc(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void store() {
+	public void store(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void add() {
+	public void add(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void sub() {
+	public void sub(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void mul() {
+	public void mul(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void div() {
+	public void div(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void eq() {
+	public void eq(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void mygoto() {
+	public void mygoto(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void gotoif() {
+	public void gotoif(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void cprint() {
+	public void cprint(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void cread() {
+	public void cread(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void exit() {
+	public void exit(byte[] command) {
 		// TODO Auto-generated method stub
 		
 	}
