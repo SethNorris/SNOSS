@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class Assembler implements AssemblerInstructions{
 	OutputStream os;
 	public Assembler()
 	{
-		
+
 	};
 
 	public void processFile(File assemblyCode) throws FileNotFoundException, IOException{
@@ -76,8 +77,9 @@ public class Assembler implements AssemblerInstructions{
 		byte[] bytes = new byte[4];
 		bytes[0] = (byte)1;
 		bytes[1] = (byte)parseRegister(dest);
-		bytes[2] = (byte)Integer.parseInt(mem.substring(2), 16);
-		bytes[3] = (byte)0;
+		byte[] temp = intToByteArray(Integer.parseInt(mem.substring(2), 16));
+		bytes[2] = temp[0];
+		bytes[3] = temp[1];
 		return bytes;
 	}
 
@@ -86,8 +88,9 @@ public class Assembler implements AssemblerInstructions{
 		byte[] bytes = new byte[4];
 		bytes[0] = (byte)10;
 		bytes[1] = (byte)parseRegister(dest);
-		bytes[2] = (byte)Integer.parseInt(val);
-		bytes[3] = (byte)0;
+		byte[] temp = intToByteArray(Integer.parseInt(val));
+		bytes[2] = temp[0];
+		bytes[3] = temp[1];
 		return bytes;
 	}
 
@@ -96,8 +99,9 @@ public class Assembler implements AssemblerInstructions{
 		byte[] bytes = new byte[4];
 		bytes[0] = (byte)2;
 		bytes[3] = (byte)parseRegister(src);
-		bytes[1] = (byte)Integer.parseInt(mem,16);
-		bytes[2] = 0;
+		byte[] temp = intToByteArray(Integer.parseInt(mem.substring(2), 16));
+		bytes[1] = temp[0];
+		bytes[2] = temp[1];
 		return bytes;
 	}
 
@@ -155,8 +159,9 @@ public class Assembler implements AssemblerInstructions{
 	public byte[] mygoto(String jump) {
 		byte[] bytes = new byte[4];
 		bytes[0] = (byte)8;
-		bytes[1] = (byte)Integer.parseInt(jump,16);
-		bytes[2] = (byte)0;
+		byte[] temp = intToByteArray(Integer.parseInt(jump.substring(2), 16));
+		bytes[1] = temp[0];
+		bytes[2] = temp[1];
 		bytes[3] = (byte)0;
 		return bytes;
 	}
@@ -165,8 +170,9 @@ public class Assembler implements AssemblerInstructions{
 	public byte[] gotoif(String jump, String src) {
 		byte[] bytes = new byte[4];
 		bytes[0] = (byte)11;
-		bytes[1] = (byte)Integer.parseInt(jump,16);
-		bytes[2] = (byte)0;
+		byte[] temp = intToByteArray(Integer.parseInt(jump.substring(2), 16));
+		bytes[1] = temp[0];
+		bytes[2] = temp[1];
 		bytes[3] = (byte)parseRegister(src);
 		return bytes;
 	}
@@ -175,8 +181,9 @@ public class Assembler implements AssemblerInstructions{
 	public byte[] cprint(String mem) {
 		byte[] bytes = new byte[4];
 		bytes[0] = (byte)9;
-		bytes[1] = (byte)Integer.parseInt(mem.substring(2),16);
-		bytes[2] = (byte)0;
+		byte[] temp = intToByteArray(Integer.parseInt(mem.substring(2), 16));
+		bytes[1] = temp[0];
+		bytes[2] = temp[1];
 		bytes[3] = (byte)0;
 		return bytes;
 	}
@@ -185,8 +192,9 @@ public class Assembler implements AssemblerInstructions{
 	public byte[] cread(String mem) {
 		byte[] bytes = new byte[4];
 		bytes[0] = (byte)16;
-		bytes[1] = (byte)Integer.parseInt(mem,16);
-		bytes[2] = (byte)0;
+		byte[] temp = intToByteArray(Integer.parseInt(mem.substring(2), 16));
+		bytes[1] = temp[0];
+		bytes[2] = temp[1];
 		bytes[3] = (byte)0;
 		return bytes;
 	}
@@ -225,13 +233,20 @@ public class Assembler implements AssemblerInstructions{
 		}
 		return toReturn;
 	}
-	
-	public static final byte[] intToByteArray(int value) {
-	    return new byte[] {
-	            (byte)(value >>> 24),
-	            (byte)(value >>> 16),
-	            (byte)(value >>> 8),
-	            (byte)value};
+
+	public byte[] intToByteArray(int value) {
+		byte[] bytes = new byte[2];
+		String bitString = Integer.toBinaryString(value);
+		String emptyString = "";
+		for(int i = 0; i < 16 - bitString.length(); i++){
+			emptyString += 0;
+		}
+		String finalString = emptyString + bitString;
+		String finalStringOne = finalString.substring(0, 8);
+		String finalStringTwo = finalString.substring(8, 16);
+		bytes[0] = (byte) Integer.parseInt(finalStringOne, 2);
+		bytes[1] = (byte)Integer.parseInt(finalStringTwo,2);
+		return bytes;
 	}
 
 
@@ -241,13 +256,13 @@ public class Assembler implements AssemblerInstructions{
 		for(byte[] array : commands){
 			for(int i = 0; i < 4; i++){
 				bytes[inc] = array[i];
-				System.out.println(bytes[inc]);
+				//System.out.println(bytes[inc]);
 				inc++;
 			}
 		}
-		System.out.println("List length: " + commands.size());
+		//System.out.println("List length: " + commands.size());
 		File snoFile = new File("/Users/sn255043/Documents/snossMem/" + concatFileType(filename) + ".sno");
-		
+
 		try {
 			FileOutputStream fos = new FileOutputStream(snoFile);
 			fos.write(bytes);
@@ -259,28 +274,12 @@ public class Assembler implements AssemblerInstructions{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//file write logic
+
 	}
-	
+
 	private String concatFileType(String name){
 		int length = name.length();
 		return name.substring(0, length - 4);
 	}
-
-//	@Override
-//	public byte[] eq(String dest, String src1, String src2) {
-//		byte[] bytes = new byte[4];
-//		bytes[0] = intToByteArray(7)[0];
-//		bytes[1] = intToByteArray(parseRegister(dest))[0];
-//		bytes[2] = intToByteArray(parseRegister(src1))[0];
-//		bytes[3] = intToByteArray(parseRegister(src2))[0];
-//		
-//		String command = Integer.toHexString(7);
-//		String result = Integer.toHexString(parseRegister(dest));
-//		String x = Integer.toHexString(parseRegister(src1));
-//		String y = Integer.toHexString(parseRegister(src2));
-//		return bytes;
-//	}
 
 }

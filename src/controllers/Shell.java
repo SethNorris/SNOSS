@@ -12,6 +12,7 @@ import assembler.Assembler;
 
 public class Shell {
 	ProcessController pc;
+	final String filePath = "/Users/sn255043/Documents/snossMem/";
 	
 	public Shell(){
 		pc = new ProcessController();
@@ -26,13 +27,18 @@ public class Shell {
 			split = input.split(" ");
 			switch(split[0]){
 			case "ls":
-				System.out.println("LS");
+				File folder = new File(filePath);
+				File[] files = folder.listFiles();
+				for(File f : files){
+					System.out.println(f.getName());
+				}
 				break;
 			case "ps":
-				System.out.println("PS");
+				for(String processName : pc.getProcessID().keySet()){
+					System.out.println(processName);
+				}
 				break;
 			case "exec":
-				System.out.println(split[1]);
 				pc.executeProcess(split[1]);
 				break;
 			case "exec_i":
