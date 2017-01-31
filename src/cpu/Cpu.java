@@ -1,8 +1,12 @@
 package cpu;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class Cpu{
 
@@ -22,7 +26,6 @@ public class Cpu{
 		int pId = ram.memory[pcbStart];
 		int start = byteArrayToInt(ram.memory[pcbStart + 1], ram.memory[pcbStart + 2]);
 		int end = byteArrayToInt(ram.memory[pcbStart + 3], ram.memory[pcbStart + 4]);
-		//System.out.println("LENGTH: " + (end - start));
 		byte[] temp = new byte[4];
 		for(int i = start; i <= end; i++){
 			temp[0] = ram.memory[i];
@@ -31,6 +34,7 @@ public class Cpu{
 			temp[3] = ram.memory[i + 3];
 			i = i + 3;
 			processCommand(temp, start, end, info);
+			instructionPointer = i;
 		}
 	}
 	
@@ -73,7 +77,7 @@ public class Cpu{
 			cread(command, pcbEnd);
 			break;
 		case 17:
-			exit(command);
+			exit(command, pcbStart, pcbEnd);
 			break;
 		}
 		if(info){
@@ -82,7 +86,6 @@ public class Cpu{
 	}
 
 	public void load(byte[] command, int end) {
-		//System.out.println("LOADING FROM RAM LOCATION " + (byteArrayToInt(command[2],command[3])+ (end + 5)) + " THE VALUE IS " + ram.read((byteArrayToInt(command[2],command[3]) + (end + 5))));
 		registers[command[1]].write(ram.read((byteArrayToInt(command[2],command[3]) + (end + 5))));
 	}
 
@@ -94,6 +97,11 @@ public class Cpu{
 		int memAddress = (byteArrayToInt(command[1],command[2]) + (end + 5));
 		if(memAddress > end + 4 && memAddress < end + 64){
 			ram.store(memAddress, registers[command[3]].read());
+		}
+		else{
+			System.out.println("CORE DUMP YA NERD");
+			writeToFile(ram,this,instructionPointer);
+			System.exit(0);
 		}
 	}
 
@@ -150,16 +158,23 @@ public class Cpu{
         try {
 			int charInt = br.read();
 			int memAddress = (byteArrayToInt(command[1],command[2]) + (end + 5));
-			//if(memAddress > end + 5 && memAddress < end + 64){
+			if(memAddress > end + 4 && memAddress < end + 64){
 				ram.store(memAddress, charInt);
-			//}
+			}
+			else{
+				System.out.println("CORE DUMP YA NERD");
+				writeToFile(ram,this,instructionPointer);
+				System.exit(0);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void exit(byte[] command) {
-		
+	public void exit(byte[] command, int start, int end) {
+		for(int i = start; i < end + 64; i++){
+			ram.memory[i] = (byte)0;
+		}
 	}
 	
 	public void putRam(RAM ram){
@@ -184,5 +199,26 @@ public class Cpu{
 		return emptyString + thing;
 	}
 	
+	private void writeToFile(RAM ram, Cpu cpu, int pointer){
+		
+		File snoFile = new File("/Users/sn255043/Documents/snossMem/CoreDump.txt");
+
+		try {
+			FileOutputStream fos = new FileOutputStream(snoFile);
+			fos.write(ram.memory);
+			for(Register reg : cpu.registers){
+				fos.write(reg.memory);
+			}
+			fos.write(pointer);
+			fos.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 	
 }

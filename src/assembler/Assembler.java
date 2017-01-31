@@ -256,11 +256,9 @@ public class Assembler implements AssemblerInstructions{
 		for(byte[] array : commands){
 			for(int i = 0; i < 4; i++){
 				bytes[inc] = array[i];
-				//System.out.println(bytes[inc]);
 				inc++;
 			}
 		}
-		//System.out.println("List length: " + commands.size());
 		File snoFile = new File("/Users/sn255043/Documents/snossMem/" + concatFileType(filename) + ".sno");
 
 		try {
