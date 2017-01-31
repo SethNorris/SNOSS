@@ -40,7 +40,7 @@ public class RAM {
 	}
 	
 	public int read(int loc){
-		 return byteArrayToInt(memory[loc],memory[loc + 1]);
+		 return byteArrayToInt(memory[loc],memory[loc+1]);
 	}
 	
 	

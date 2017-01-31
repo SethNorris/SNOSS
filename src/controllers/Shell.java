@@ -39,10 +39,10 @@ public class Shell {
 				}
 				break;
 			case "exec":
-				pc.executeProcess(split[1]);
+				pc.executeProcess(split[1], false);
 				break;
 			case "exec_i":
-				System.out.println(split[1]);
+				pc.executeProcess(split[1], true);
 				break;
 			case "kill":
 				System.out.println(split[1]);

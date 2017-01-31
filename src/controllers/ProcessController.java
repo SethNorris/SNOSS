@@ -28,20 +28,19 @@ public class ProcessController {
 		cpu = new Cpu();
 	}
 	
-	public void executeProcess(String fileName) throws FileNotFoundException, IOException{
+	public void executeProcess(String fileName, boolean i) throws FileNotFoundException, IOException{
 		Path filepath = Paths.get(filePath + fileName);
 		File execFile = filepath.toFile();
 		Assembler assembler = new Assembler();
 		assembler.processFile(execFile);
 		Path filepathfinish = Paths.get(filePath + concatFileType(fileName) + ".sno");
 		byte[] temp = Files.readAllBytes(filepathfinish);
-		System.out.println("TEMP LENGTH: " + temp.length);
 		String processKey = concatFileType(fileName);
 		storeProcessInRam(temp, processKey);
 		processID.put(processKey, id);
 		id++;
 		cpu.putRam(ram);
-		cpu.doProgram(pcbLocations.get(processKey));
+		cpu.doProgram(pcbLocations.get(processKey), i);
 	}
 	
 	private String concatFileType(String name){

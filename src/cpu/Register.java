@@ -10,7 +10,7 @@ public class Register {
 	}
 	
 	public void write(int i){
-		byte[] temp = intToByteArray(i);//memory[0] = (byte)i;
+		byte[] temp = intToByteArray(i);
 		memory[0] = temp[0];
 		memory[1] = temp[1];
 	}
@@ -23,8 +23,6 @@ public class Register {
 	private int byteArrayToInt(byte x, byte y){
 		int first = x;
 		int second = y;
-		//System.out.println("FIRST: " + x);
-		//System.out.println("SECOND: " + y);
 		String firstString = addZeros(Integer.toBinaryString(first & 0xff));
 		String secondString = addZeros(Integer.toBinaryString(second & 0xff));
 		String finalString = firstString + secondString;
@@ -33,7 +31,6 @@ public class Register {
 	}
 	
 	private String addZeros(String thing){
-		//System.out.println("THING: " + thing);
 		String emptyString = "";
 		for(int i = 0; i < 8 - thing.length(); i++){
 			emptyString += 0;
@@ -56,3 +53,5 @@ public class Register {
 		return bytes;
 	}
 }
+
+

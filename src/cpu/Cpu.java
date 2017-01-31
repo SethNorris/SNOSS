@@ -1,9 +1,14 @@
 package cpu;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class Cpu{
 
 	RAM ram;
 	Register[] registers = new Register[6];
+	int instructionPointer = 0;
 	public Cpu(){
 		for(int i = 0; i < 6; i++){
 			registers[i] = new Register();
@@ -13,10 +18,11 @@ public class Cpu{
 	
 	
 
-	public void doProgram(int pcbStart){
+	public void doProgram(int pcbStart, boolean info){
 		int pId = ram.memory[pcbStart];
 		int start = byteArrayToInt(ram.memory[pcbStart + 1], ram.memory[pcbStart + 2]);
 		int end = byteArrayToInt(ram.memory[pcbStart + 3], ram.memory[pcbStart + 4]);
+		//System.out.println("LENGTH: " + (end - start));
 		byte[] temp = new byte[4];
 		for(int i = start; i <= end; i++){
 			temp[0] = ram.memory[i];
@@ -24,20 +30,20 @@ public class Cpu{
 			temp[2] = ram.memory[i + 2];
 			temp[3] = ram.memory[i + 3];
 			i = i + 3;
-			processCommand(temp, start, end);
+			processCommand(temp, start, end, info);
 		}
 	}
 	
-	public void processCommand(byte[] command, int pcbStart, int pcbEnd){
+	public void processCommand(byte[] command, int pcbStart, int pcbEnd, boolean info){
 		switch(command[0]){
 		case 1:
-			load(command);
+			load(command, pcbEnd);
 			break;
 		case 10:
 			loadc(command);
 			break;
 		case 2:
-			store(command, pcbStart, pcbEnd);
+			store(command, pcbEnd);
 			break;
 		case 3:
 			add(command);
@@ -61,30 +67,32 @@ public class Cpu{
 			gotoif(command);
 			break;
 		case 9:
-			cprint(command);
+			cprint(command, pcbEnd);
 			break;
 		case 16:
-			cread(command);
+			cread(command, pcbEnd);
 			break;
 		case 17:
 			exit(command);
 			break;
 		}
+		if(info){
+			System.out.println("Instruction: " + command[0]);
+		}
 	}
 
-	public void load(byte[] command) {
-		
+	public void load(byte[] command, int end) {
+		//System.out.println("LOADING FROM RAM LOCATION " + (byteArrayToInt(command[2],command[3])+ (end + 5)) + " THE VALUE IS " + ram.read((byteArrayToInt(command[2],command[3]) + (end + 5))));
+		registers[command[1]].write(ram.read((byteArrayToInt(command[2],command[3]) + (end + 5))));
 	}
 
 	public void loadc(byte[] command) {
 		registers[command[1]].write(byteArrayToInt(command[2],command[3]));
 	}
 
-	public void store(byte[] command, int start, int end) {
-		
-		//System.out.println("STORE" + i++);
-		int memAddress = byteArrayToInt(command[1],command[2]);
-		if(start + memAddress < end - 1){
+	public void store(byte[] command, int end) {
+		int memAddress = (byteArrayToInt(command[1],command[2]) + (end + 5));
+		if(memAddress > end + 4 && memAddress < end + 64){
 			ram.store(memAddress, registers[command[3]].read());
 		}
 	}
@@ -114,23 +122,40 @@ public class Cpu{
 	}
 
 	public void eq(byte[] command) {
-		
+		if(registers[command[2]].read() == registers[command[3]].read() ){
+			registers[command[1]].write(1);
+		}
+		else{
+			registers[command[1]].write(0);
+		}
 	}
 
 	public void mygoto(byte[] command) {
-		
+		instructionPointer = byteArrayToInt(command[1], command[2]);
 	}
 
 	public void gotoif(byte[] command) {
-		
+		if(registers[command[3]].read() != 0){
+			instructionPointer = byteArrayToInt(command[1], command[2]);
+		}
 	}
 
-	public void cprint(byte[] command) {
-		System.out.println("CPRINT: "  + ram.read(byteArrayToInt(command[1],command[2])));
+	public void cprint(byte[] command, int end) {
+		System.out.println("CPRINT: "  + ram.read((byteArrayToInt(command[1],command[2]) + (end + 5))));
 	}
 
-	public void cread(byte[] command) {
-		
+	public void cread(byte[] command, int end) {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Input: ");
+        try {
+			int charInt = br.read();
+			int memAddress = (byteArrayToInt(command[1],command[2]) + (end + 5));
+			//if(memAddress > end + 5 && memAddress < end + 64){
+				ram.store(memAddress, charInt);
+			//}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void exit(byte[] command) {
